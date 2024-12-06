@@ -57,13 +57,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="carro" class="form-label">Tipo de Aplicação</label>
+                        <label for="carro" class="form-label">Tipo de Aplicação (Carro)</label>
                         <select class="form-select" id="carro" name="carro" required>
                             <option value="" disabled selected>Selecione...</option>
                             <option value="carga" data-bs-toggle="tooltip" title="Ex: Saveiro">Carga</option>
                             <option value="passeio" data-bs-toggle="tooltip" title="Ex: Polo">Passeio</option>
                             <option value="indiferente" data-bs-toggle="tooltip" title="Qualquer tipo de carro serve">Indiferente</option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">Motivo</label>
+                        <input type="text" class="form-control" id="motivo" name="motivo" placeholder="Por que está agendando?" required>
                     </div>
 
                     <div class="d-grid">

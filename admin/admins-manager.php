@@ -1,5 +1,10 @@
 <?php
 include "../app/models/header.php";
+
+require_once "../app/controllers/get-admins.php";
+require_once "../app/controllers/insert-admin.php";
+
+$admins = fetchAdmins();
 ?>
 
 <!DOCTYPE html>
@@ -32,24 +37,25 @@ include "../app/models/header.php";
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>João Silva</td>
-                        <td>joao.silva@exemplo.com</td>
-                        <td><span class="badge bg-success">Ativo</span></td>
-                        <td>
-                            <button class="btn btn-warning btn-sm">Desativar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Maria Souza</td>
-                        <td>maria.souza@exemplo.com</td>
-                        <td><span class="badge bg-danger">Inativo</span></td>
-                        <td>
-                            <button class="btn btn-success btn-sm">Ativar</button>
-                        </td>
-                    </tr>
+                    <?php foreach ($admins as $admin): ?>
+                        <tr>
+                            <td><?= $admin['id']; ?></td>
+                            <td><?= htmlspecialchars($admin['nome']); ?></td>
+                            <td><?= htmlspecialchars($admin['email']); ?></td>
+                            <td>
+                                <span class="badge <?= $admin['ativo'] ? 'bg-success' : 'bg-danger'; ?>">
+                                    <?= $admin['ativo'] ? 'Ativo' : 'Inativo'; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php if ($admin['ativo']): ?>
+                                    <button class="btn btn-warning btn-sm">Desativar</button>
+                                <?php else: ?>
+                                    <button class="btn btn-success btn-sm">Ativar</button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -92,9 +98,36 @@ include "../app/models/header.php";
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" form="addAdminForm" class="btn btn-success">Salvar</button>
                 </div>
+
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('addAdminForm').addEventListener('submit', function(e) {
+            //e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('insert-admin.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                if (data.includes('sucesso')) {
+                    const modalElement = document.getElementById('addAdminModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    document.getElementById('addAdminForm').reset();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar dados: ', error);
+            });
+        });
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

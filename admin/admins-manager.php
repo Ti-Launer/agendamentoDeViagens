@@ -59,7 +59,7 @@ include "../app/models/header.php";
     <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header bg-dark text-white">
                     <h5 class="modal-title" id="addAdminModalLabel">Adicionar Novo Administrador</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -90,7 +90,7 @@ include "../app/models/header.php";
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="addAdminForm" class="btn btn-primary">Salvar</button>
+                    <button type="submit" form="addAdminForm" class="btn btn-success">Salvar</button>
                 </div>
             </div>
         </div>

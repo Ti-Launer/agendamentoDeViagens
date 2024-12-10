@@ -43,15 +43,19 @@ $admins = fetchAdmins();
                             <td><?= htmlspecialchars($admin['nome']); ?></td>
                             <td><?= htmlspecialchars($admin['email']); ?></td>
                             <td>
-                                <span class="badge <?= $admin['ativo'] ? 'bg-success' : 'bg-danger'; ?>">
-                                    <?= $admin['ativo'] ? 'Ativo' : 'Inativo'; ?>
+                                <span class="badge <?= $admin['ativo'] === 'yes' ? 'bg-success' : 'bg-danger'; ?>">
+                                    <?= $admin['ativo'] === 'yes' ? 'Ativo' : 'Inativo'; ?>
                                 </span>
                             </td>
                             <td>
-                                <?php if ($admin['ativo']): ?>
-                                    <button class="btn btn-warning btn-sm">Desativar</button>
+                                <?php if ($admin['ativo'] === 'yes'): ?>
+                                    <button class="btn btn-warning btn-sm toggle-status" data-id="<?= $admin['id']; ?>" data-status="no">
+                                        Desativar
+                                    </button>
                                 <?php else: ?>
-                                    <button class="btn btn-success btn-sm">Ativar</button>
+                                    <button class="btn btn-success btn-sm toggle-status" data-id="<?= $admin['id']; ?>" data-status="yes">
+                                        Ativar
+                                    </button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -105,15 +109,20 @@ $admins = fetchAdmins();
 
     <script>
         document.getElementById('addAdminForm').addEventListener('submit', function(e) {
-            //e.preventDefault();
+            e.preventDefault();
 
             const formData = new FormData(this);
 
-            fetch('insert-admin.php', {
+            fetch('../app/controllers/insert-admin.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na resposta do servidor')
+                }
+                return response.text();
+            })
             .then(data => {
                 alert(data);
                 if (data.includes('sucesso')) {
@@ -121,10 +130,47 @@ $admins = fetchAdmins();
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     modalInstance.hide();
                     document.getElementById('addAdminForm').reset();
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Erro ao enviar dados: ', error);
+                alert('Erro ao adicionar administrador. Verifique o console.');
+            });
+        });
+
+        document.querySelectorAll('.toggle-status').forEach(button => {
+            button.addEventListener('click', function() {
+                const adminId = this.getAttribute('data-id');
+                const newStatus = this.getAttribute('data-status');
+
+                if (confirm(`Tem certeza que deseja ${newStatus === 'no' ? 'desativar' : 'ativar'} este administrador?`)) {
+                    fetch('../app/controllers/toggle-admin-status.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            adminId: adminId,
+                            newStatus: newStatus
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na resposta do servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar status: ', error);
+                        alert('Erro ao atualizar status. Verifique o console.')
+                    });
+                    
+                }
             });
         });
     </script>

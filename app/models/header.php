@@ -11,6 +11,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <nav>
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
+                        <a class="nav-link text-white <?php echo $currentPage === 'dashboard.php' ? 'active bg-dark' : ''; ?>" href="dashboard.php">Painel</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-white <?php echo $currentPage === 'admins-manager.php' ? 'active bg-dark' : ''; ?>" href="admins-manager.php">Admins</a>
                     </li>
                     <li class="nav-item">
@@ -20,7 +23,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <a class="nav-link text-white <?php echo $currentPage === 'cars-manager.php' ? 'active bg-dark' : ''; ?>" href="cars-manager.php">Carros</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white <?php echo $currentPage === 'logout.php' ? 'active bg-dark' : ''; ?>" href="/app/controllers/logout.php">Sair</a>
+                        <a class="nav-link text-white <?php echo $currentPage === 'logout.php' ? 'active bg-dark' : ''; ?> danger" href="logout.php">Sair</a>
+                        <style>
+                            .danger:hover {
+                                color: red !important;
+                                border-color: red !important;
+                            }
+                        </style>
                     </li>
                 </ul>
             </nav>

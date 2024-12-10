@@ -1,5 +1,10 @@
 <?php
+require_once '../app/controllers/db.php';
+require_once 'session_verify.php';
+require_once "../app/controllers/get-cars.php";
 include "../app/models/header.php";
+
+$cars = fetchCars();
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +28,7 @@ include "../app/models/header.php";
         <div class="form-check mb-4">
             <input type="checkbox" class="form-check-input" id="showInactiveCars" name="showInactiveCars" onchange="toggleInactiveCars()">
             <label class="form-check-label" for="showInactiveCars">
-                Visualizar Carros Inativos
+                Visualizar Carros Inativos/Desativar Carros
             </label>
         </div>
         <script>
@@ -54,45 +59,30 @@ include "../app/models/header.php";
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Saveiro</td>
-                        <td>ABC1D23</td>
-                        <td>Branco</td>
-                        <td><span class="badge bg-success">Pode Viajar</span></td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" title="Colocar carro em Manutenção (não pode usar para viagens).">Manutenção</button>
-                        </td>
-                        <td class="cellToggle" style="display: none;">
-                            <button class="btn btn-danger btn-sm">Desativar</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Polo</td>
-                        <td>EFG4H56</td>
-                        <td>Preto</td>
-                        <td><span class="badge bg-danger">Em Manutenção</span></td>
-                        <td>
-                            <button class="btn btn-success btn-sm">Liberar</button>
-                        </td>
-                        <td class="cellToggle" style="display: none;">
-                            <button class="btn btn-danger btn-sm" title="Desativa o carro para uso completamente.">Desativar</button>
-                        </td>
-                    </tr>
-                    <tr id="example" style="display: none;">
-                        <td>3</td>
-                        <td>Saveiro</td>
-                        <td>ABC1D23</td>
-                        <td>Branco</td>
-                        <td><span class="badge bg-success">Pode Viajar</span></td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" title="Colocar carro em Manutenção (não pode usar para viagens).">Manutenção</button>
-                        </td>
-                        <td class="cellToggle" style="display: none;">
-                            <button class="btn btn-danger btn-sm">Ativar</button>
-                        </td>
-                    </tr>
+                    <?php foreach ($cars as $car): ?>
+                        <tr>
+                            <td><?= $car['id']; ?></td>
+                            <td><?= htmlspecialchars($car['modelo']); ?></td>
+                            <td><?= htmlspecialchars($car['placa']); ?></td>
+                            <td><?= htmlspecialchars($car['detalhe']); ?></td>
+                            <td>
+                                <span class="badge <?= $car['condicao'] === 'boa' ? 'bg-success' : 'bg-danger'; ?>">
+                                    <?= $car['condicao'] === 'boa' ? 'Normal' : 'Manutenção'; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php if ($car['condicao'] === 'boa'): ?>
+                                    <button class="btn btn-warning btn-sm toggle-status" data-id="<?= $car['id']; ?>" data-status="ruim">
+                                        Desativar
+                                    </button>
+                                <?php else: ?>
+                                    <button class="btn btn-success btn-sm toggle-status" data-id="<?= $car['id']; ?>" data-status="boa">
+                                        Ativar
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -114,23 +104,89 @@ include "../app/models/header.php";
                         </div>
                         
                         <div class="mb-3">
-                            <label for="carPlate" class="form-label">E-mail</label>
+                            <label for="carPlate" class="form-label">Placa</label>
                             <input type="text" class="form-control" id="carPlate" name="carPlate" placeholder="Ex: ABC1D23" required>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="carParticularity" class="form-label">Senha</label>
+                            <label for="carParticularity" class="form-label">Particularidade</label>
                             <input type="text" class="form-control" id="carParticularity" name="carParticularity" placeholder="Ex: Carro do João" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="addAdminForm" class="btn btn-success">Salvar</button>
+                    <button type="submit" form="addCarForm" class="btn btn-success">Salvar</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('addCarForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('../app/controllers/insert-car.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na resposta do servidor')
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data);
+                if (data.includes('sucesso')) {
+                    const modalElement = document.getElementById('addCarModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    document.getElementById('addCarForm').reset();
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar dados: ', error);
+                alert('Erro ao adicionar um Novo Carro. Verifique o console ou contate a TI.');
+            });
+        });
+
+         document.querySelectorAll('.toggle-status').forEach(button => {
+            button.addEventListener('click', function() {
+                const carId = this.getAttribute('data-id');
+                const newStatus = this.getAttribute('data-status');
+
+                fetch('../app/controllers/toggle-car-usage.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        carId: carId,
+                        newStatus: newStatus
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Erro ao atualizar status: ', error);
+                    alert('Erro ao atualizar status. Verifique o console.')
+                });
+                    
+            });
+        });
+    </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

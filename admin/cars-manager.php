@@ -1,7 +1,7 @@
 <?php
+require_once "../app/controllers/get-cars.php";
 require_once '../app/controllers/db.php';
 require_once 'session_verify.php';
-require_once "../app/controllers/get-cars.php";
 include "../app/models/header.php";
 
 $cars = fetchCars();
@@ -14,6 +14,11 @@ $cars = fetchCars();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Administrador</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .display-none {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
@@ -24,59 +29,78 @@ $cars = fetchCars();
                 Adicionar Outro Carro
             </button>
         </div>
-
-        <div class="form-check mb-4">
-            <input type="checkbox" class="form-check-input" id="showInactiveCars" name="showInactiveCars" onchange="toggleInactiveCars()">
-            <label class="form-check-label" for="showInactiveCars">
-                Visualizar Carros Inativos/Desativar Carros
-            </label>
-        </div>
+        <?php if (isset($_SESSION['master']) && $_SESSION['master'] === 'yes'): ?>
+            <div class="form-check mb-4">
+                <input type="checkbox" class="form-check-input" id="showInactiveCars" name="showInactiveCars" onchange="toggleInactiveCars()">
+                <label class="form-check-label" for="showInactiveCars">
+                    Visualizar Carros Inativos/Desativar Carros
+                </label>
+            </div>
+        <?php endif; ?>
         <script>
             function toggleInactiveCars() {
                 const isChecked = document.getElementById('showInactiveCars').checked;
-                const header = document.getElementById('headerToggle');
-                const cells = document.querySelectorAll('.cellToggle');
-                const example = document.getElementById('example');
+                const header = document.getElementById('inactive-cars-header');
+                const cells = document.querySelectorAll('.inactive-cars-cell');
+                const inactiveCars = document.querySelectorAll('.inactive-car');
 
-                example.style.display = isChecked ? 'table-row' : 'none';
                 header.style.display = isChecked ? 'table-cell' : 'none';
+                inactiveCars.forEach(car => {
+                    car.style.display = isChecked ? 'table-row' : 'none';
+                });
                 cells.forEach(cell => {
                     cell.style.display = isChecked ? 'table-cell' : 'none';
                 });
             }
         </script>
         <div class="table-responsive">
-            <table class="table table-dark table-hover table-bordered align-middle">
-                <thead class="table-primary">
+            <table class="table table-light table-hover table-bordered align-middle">
+                <thead class="table-dark">
                     <tr>
-                        <th>#</th>
                         <th>Modelo</th>
                         <th>Placa</th>
+                        <th>Tipo do Carro</th>
                         <th>Particularidade</th>
                         <th>Condição</th>
                         <th>Atualizar</th>
-                        <th id="headerToggle" style="display: none;">Ativar/Desativar</th>
+                        <th id="inactive-cars-header" style="display: none;">Ativar/Desativar</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($cars as $car): ?>
-                        <tr>
-                            <td><?= $car['id']; ?></td>
+                        <tr class="<?= $car['ativo'] === 'no' ? 'inactive-car display-none' : '';?>">
                             <td><?= htmlspecialchars($car['modelo']); ?></td>
                             <td><?= htmlspecialchars($car['placa']); ?></td>
+                            <td>
+                                <span class="badge <?= $car['tipo_carro'] === 'carga' ? 'bg-primary' : 'bg-info'; ?>">
+                                    <?= $car['tipo_carro'] === 'carga' ? 'Carga' : 'Passeio'; ?>
+                                </span>
+                            </td>
                             <td><?= htmlspecialchars($car['detalhe']); ?></td>
                             <td>
-                                <span class="badge <?= $car['condicao'] === 'boa' ? 'bg-success' : 'bg-danger'; ?>">
+                                <span class="badge 
+                                    <?= $car['condicao'] === 'boa' ? 'bg-success' : 'bg-warning text-black'; ?>">
                                     <?= $car['condicao'] === 'boa' ? 'Normal' : 'Manutenção'; ?>
                                 </span>
                             </td>
                             <td>
                                 <?php if ($car['condicao'] === 'boa'): ?>
-                                    <button class="btn btn-warning btn-sm toggle-status" data-id="<?= $car['id']; ?>" data-status="ruim">
+                                    <button class="btn btn-warning btn-sm toggle-status" data-id="<?= $car['placa']; ?>" data-status="manutencao" title="Marcar carro sob manutenção (impede pessoas de agendá-lo).">
+                                        Manutenção
+                                    </button>
+                                <?php else: ?>
+                                    <button class="btn btn-success btn-sm toggle-status" data-id="<?= $car['placa']; ?>" data-status="boa" title="Liberar o carro para uso.">
+                                        Liberar
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                            <td class="inactive-cars-cell display-none">
+                                <?php if ($car['ativo'] == 1): ?>
+                                    <button class="btn btn-danger btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-status="0">
                                         Desativar
                                     </button>
                                 <?php else: ?>
-                                    <button class="btn btn-success btn-sm toggle-status" data-id="<?= $car['id']; ?>" data-status="boa">
+                                    <button class="btn btn-primary btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-status="1">
                                         Ativar
                                     </button>
                                 <?php endif; ?>
@@ -107,10 +131,19 @@ $cars = fetchCars();
                             <label for="carPlate" class="form-label">Placa</label>
                             <input type="text" class="form-control" id="carPlate" name="carPlate" placeholder="Ex: ABC1D23" required>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="carType" class="form-label">Tipo de Aplicação</label>
+                                <select class="form-select" id="carType" name="carType" required>
+                                    <option value="" disabled selected>Selecione...</option>
+                                    <option value="carga" data-bs-toggle="tooltip">Carga</option>
+                                    <option value="passeio" data-bs-toggle="tooltip">Passeio</option>
+                                </select>
+                        </div>
                         
                         <div class="mb-3">
-                            <label for="carParticularity" class="form-label">Particularidade</label>
-                            <input type="text" class="form-control" id="carParticularity" name="carParticularity" placeholder="Ex: Carro do João" required>
+                            <label for="carDetail" class="form-label">Particularidade</label>
+                            <input type="text" class="form-control" id="carDetail" name="carDetail" placeholder="Ex: Carro do João" required>
                         </div>
                     </form>
                 </div>
@@ -154,7 +187,42 @@ $cars = fetchCars();
             });
         });
 
-         document.querySelectorAll('.toggle-status').forEach(button => {
+        // Toggle Status
+        document.querySelectorAll('.toggle-status').forEach(button => {
+            button.addEventListener('click', function() {
+                const carId = this.getAttribute('data-id');
+                const newStatus = this.getAttribute('data-status');
+
+                fetch('../app/controllers/toggle-car-status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        carId: carId,
+                        newStatus: newStatus
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Erro ao atualizar status: ', error);
+                    alert('Erro ao atualizar status. Verifique o console.')
+                });
+                    
+            });
+        });
+
+        // Toggle Usage
+        document.querySelectorAll('.toggle-usage').forEach(button => {
             button.addEventListener('click', function() {
                 const carId = this.getAttribute('data-id');
                 const newStatus = this.getAttribute('data-status');

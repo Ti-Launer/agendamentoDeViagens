@@ -1,17 +1,20 @@
 <?php
 require_once "db.php";
-function fetchAdmins() {
+function fetchPendingReservations() {
+
     $database = new Database();
     $pdo = $database->connect();
 
     try {
-        $sql = 'SELECT id, nome, email, ativo FROM admins';
+        // Buscando reservas pendentes
+        $sql = "SELECT * FROM reservas_pendentes";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        echo "Erro ao buscar administradores: " . $e->getMessage();
+        echo "Erro ao buscar reservas pendentes: " . $e->getMessage();
         return [];
     }
 }
+
+$reservasPendentes = fetchPendingReservations();

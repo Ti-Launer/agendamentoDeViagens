@@ -11,14 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $newStatus= $_POST['newStatus'];
 
     // Validação Básica
-    if (!is_numeric($carId) || !in_array($newStatus, ['boa', 'ruim'])) {
+    if (!is_numeric($carId) || !in_array($newStatus, ['yes', 'no'])) {
         http_response_code(400);
         echo json_encode(['error' => 'Parâmetros inválidos.']);
         exit;
     }
 
     try {
-        $sql = 'UPDATE carros SET condicar = :newStatus WHERE id = :carId';
+        $sql = 'UPDATE carros SET ativo = :newStatus WHERE id = :carId';
         $stmt = $pdo->prepare($sql);
 
         $stmt->bindParam(':carId', $carId);

@@ -11,7 +11,7 @@ function fetchCars() {
     $pdo = $database->connect();
 
     try {
-        $sql = 'SELECT id, modelo, placa, detalhe, condicao, ativo FROM carros';
+        $sql = 'SELECT modelo, placa, tipo_carro, detalhe, condicao, ativo FROM carros';
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
 

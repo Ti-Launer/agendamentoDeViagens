@@ -1,8 +1,10 @@
 <?php
-include "../app/models/header.php";
-
-require_once "../app/controllers/get-admins.php";
 require_once "../app/controllers/insert-admin.php";
+require_once "../app/controllers/get-admins.php";
+
+require_once '../app/controllers/db.php';
+require_once 'session_verify.php';
+include "../app/models/header.php";
 
 $admins = fetchAdmins();
 ?>
@@ -26,8 +28,8 @@ $admins = fetchAdmins();
         </div>
 
         <div class="table-responsive">
-            <table class="table table-dark table-hover table-bordered align-middle">
-                <thead class="table-primary">
+            <table class="table table-light table-bordered align-middle table-striped">
+                <thead class="table-dark">
                     <tr>
                         <th>#</th>
                         <th>Nome</th>

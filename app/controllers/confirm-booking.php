@@ -1,6 +1,6 @@
 <?php
-require_once "db.php";
-
+require_once 'db.php';
+require_once '../../config/email-config.php';
 function confirmarReserva($id, $carro) {
     $database = new Database();
     $pdo = $database->connect();
@@ -14,9 +14,52 @@ function confirmarReserva($id, $carro) {
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':carro', $carro, PDO::PARAM_STR);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
+        if ($stmt->execute()) {
+            $sqlEmail = "SELECT * FROM reservas WHERE id = :id";
+            $stmtEmail = $pdo->prepare($sqlEmail);
+            $stmtEmail->bindValue(':id', $id, PDO::PARAM_INT);
+            $stmtEmail->execute();
+            $reserva = $stmtEmail->fetch(PDO::FETCH_ASSOC);
+            
+            if ($reserva) {
+                $nome = $reserva['nome'];
+                $email = $reserva['email'];
+                $placa = $reserva['carro'];
+                $dataInicio = $reserva['data_inicio'];
+                $dataFim = $reserva['data_fim'];
+                $destino = $reserva['destino_motivo'];
 
-        return ['status' => 'success', 'message' => 'Reserva confirmada. Dados inseridos automaticamente na agenda de carros.'];
+                $sqlGetCar = 'SELECT modelo, placa FROM carros WHERE placa = :placa';
+                $stmtGetCar = $pdo->prepare($sqlGetCar);
+                $stmtGetCar->bindValue(':placa', $placa, PDO::PARAM_STR);
+                $stmtGetCar->execute();
+                $carro = $stmtGetCar->fetch(PDO::FETCH_ASSOC);
+
+                if ($carro) {
+                    $placaCarro = $carro['placa'];
+                    $modeloCarro = $carro['modelo'];
+
+                    $emailConfig = new EmailConfig();
+                    // ENVIO DE EMAIL CLIENTE
+
+                    $subjectConfirmation = "Reserva aprovada e confirmada!";
+                    $bodyConfirmation = "<h1>Olá de novo, $nome!</h1><p>Sua reserva para destino/motivo <strong>\"$destino\"</strong> está confirmada para os seguintes dias/horários:<br>
+                    <strong>Início:</strong> $dataInicio<br>
+                    <strong>Fim:</strong> $dataFim</p>
+                    <h3><strong>UTILZAR CARRO:</strong> $placaCarro - $modeloCarro.</h3>
+                    <p>Você receberá um e-mail como este quando a data estiver próxima para preencher mais informações sobre a viagem.</p>";
+                    $altBodyConfirmation = "Olá de novo, $nome! Sua reserva está esperando para ser aprovada por alguém responsável.
+                    Você receberá um e-mail quando ela for atualizada.";
+
+                    if (!($emailConfig->sendMail($email, $subjectConfirmation, $bodyConfirmation, $altBodyConfirmation))) {
+                        echo "Erro ao enviar e-mail.";
+                    }
+                }
+            }
+        }
+        
+
+        return ['status' => 'success', 'message' => 'Reserva confirmada. Agenda do carro atualizada.'];
     } catch (PDOException $e) {
         return ['status' => 'error', 'message' => 'Erro ao confirmar reserva: ' . $e->getMessage()];
     } catch (Exception $e) {

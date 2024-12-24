@@ -65,7 +65,10 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" form="addBookingForm" class="btn btn-success">Reservar</button>
+                        <button type="submit" form="addBookingForm" class="btn btn-success" id="submitBtn">
+                            Reservar
+                            <span class="spinner-border spinner-border-sm text-light d-none" id="spinner" role="status" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -128,6 +131,10 @@
 
             const formData = new FormData(this);
 
+            // Exibir spinner
+            document.getElementById('spinner').classList.remove('d-none');
+            document.getElementById('submitBtn').disabled = true;
+
             fetch('app/controllers/new-booking.php', {
                 method: 'POST',
                 body: formData
@@ -139,6 +146,9 @@
                 return response.json();
             })
             .then(data => {
+                // Ocultar spinner e habilitar o botão novamente
+                document.getElementById('spinner').classList.add('d-none');
+                document.getElementById('submitBtn').disabled = false;
                 if (data.status === 'success') {
                     const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
                     const modalBody = document.getElementById('modalBody');
@@ -165,7 +175,10 @@
                     alert(data.message || 'Erro ao processar a reserva.');
                 }
             })
-            .catch(error => {
+            .catch(error => { // Ocultar spinner e habilitar o botão novamente
+                document.getElementById('spinner').classList.add('d-none');
+                document.getElementById('submitBtn').disabled = false;
+                
                 console.error('Erro ao enviar dados: ', error);
                 alert('Erro ao processar a reserva. Verifique o console.');
             });

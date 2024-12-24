@@ -1,5 +1,7 @@
 <?php
 require_once 'db.php';
+require_once '../../config/email-config.php';
+require_once 'get-active-admins.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = htmlspecialchars($_POST['nome']);
@@ -49,6 +51,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'tipo_carro' => $tipoCarro,
                 'motivo' => $motivo
             ]);
+              
+            $emailConfig = new EmailConfig();
+            // ENVIO DE EMAIL CLIENTE
+
+            $subject = "Reserva pendente de aprovação";
+            $body = "<h1>Olá, $nome!</h1><p>Sua reserva está esperando para ser aprovada por alguém responsável.</p>
+            <p>Você receberá um e-mail como este quando ela for atualizada.</p>";
+            $altBody = "Olá, $nome! Sua reserva está esperando para ser aprovada por alguém responsável.
+            Você receberá um e-mail quando ela for atualizada.";
+
+            if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
+                echo "Erro ao enviar e-mail.";
+            }
+
+            // ENVIO DE EMAIL ADMIN
+            fetchActiveAdmins();
+            foreach ($adminEmails as $adminEmail) {
+                $subjectAdmin = "Nova reserva pendente de aprovação";
+                $bodyAdmin = "<h1>Reserva de $nome!</h1><p>Há uma reserva esperando para ser aprovada.</p>
+                    <p>Verifique no link <a href='localhost/agendamentoDeViagens/admin/dashboard.php'>AQUI</a>.</p>";
+                $altBodyAdmin = "Reserva de $nome! Há uma reserva esperando para ser aprovada.
+                    Verifique no link: 192.168.0.201:50/agendamentoDeViagens/admin/dashboard.php).";
+
+                if (!($emailConfig->sendMail($adminEmail, $subjectAdmin, $bodyAdmin, $altBodyAdmin))) {
+                    echo "Erro ao enviar e-mail para administradores.";
+                }
+            }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Erro ao criar a reserva.']);
         }

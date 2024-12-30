@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 19, 2024 at 06:12 PM
+-- Generation Time: Dec 26, 2024 at 12:17 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -44,6 +44,23 @@ CREATE TABLE `admins` (
 
 INSERT INTO `admins` (`id`, `nome`, `username`, `email`, `senha`, `master`, `forca_senha`, `ativo`) VALUES
 (3, 'Diogo Augusto Wermann', 'diogo-augusto-wermann', 'ti@launer.com.br', '$2y$10$NvQPoyWzWXxrU.TWrWt2lOEKdJV95xx1s3BmKv/zuf7STezlK0Ece', 'yes', 'no', 'yes');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `admins_ativos`
+-- (See below for the actual view)
+--
+CREATE TABLE `admins_ativos` (
+`id` int(11)
+,`nome` varchar(100)
+,`username` varchar(100)
+,`email` varchar(100)
+,`senha` varchar(255)
+,`master` enum('yes','no')
+,`forca_senha` enum('yes','no')
+,`ativo` enum('yes','no')
+);
 
 -- --------------------------------------------------------
 
@@ -155,6 +172,15 @@ CREATE TABLE `reservas_pendentes` (
 ,`status` enum('pendente','confirmado','cancelado')
 ,`tipo_reserva` enum('curta','longa')
 );
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `admins_ativos`
+--
+DROP TABLE IF EXISTS `admins_ativos`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `admins_ativos`  AS SELECT `admins`.`id` AS `id`, `admins`.`nome` AS `nome`, `admins`.`username` AS `username`, `admins`.`email` AS `email`, `admins`.`senha` AS `senha`, `admins`.`master` AS `master`, `admins`.`forca_senha` AS `forca_senha`, `admins`.`ativo` AS `ativo` FROM `admins` WHERE `admins`.`ativo` = 1 ;
 
 -- --------------------------------------------------------
 

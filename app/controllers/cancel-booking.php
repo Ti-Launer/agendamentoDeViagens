@@ -1,6 +1,6 @@
 <?php
 require_once 'db.php';
-require_once '../../config/email-config.php';
+require_once './config/email-config.php';
 function cancelarReserva($id, $mensagemCancelamento) {
     $database = new Database();
     $pdo = $database->connect();

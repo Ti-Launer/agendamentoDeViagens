@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->rowCount() > 0) {
             $_SESSION['success_message'] = "Senha alterada com sucesso!";
-            header('Location: /agendamentoDeViagens/admin/dashboard.php');
+            header('Location: /admin/dashboard.php');
         } else {
             echo "Nenhuma alteração foi feita. Verifique seus dados.";
         }

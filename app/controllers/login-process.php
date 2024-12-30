@@ -3,7 +3,7 @@ require_once 'db.php';
 session_start();
 
 error_reporting(E_ALL);
-ini_set('display_errors',1);
+ini_set('display_errors', 1);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars($_POST['adminUser']);
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo = $database->connect();
 
     try {
-        $sql = 'SELECT id, nome, email, senha, ativo, forca_senha FROM admins WHERE username = :username';
+        $sql = 'SELECT id, nome, email, senha, ativo, forca_senha, master FROM admins WHERE username = :username';
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':username', $username);
         $stmt->execute();
@@ -22,31 +22,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($admin && password_verify($password, $admin['senha'])) {
             if ($admin['ativo'] === 'yes') {
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_name'] = $admin['nome'];
+                $_SESSION['admin_email'] = $admin['email'];
+                $_SESSION['is_master'] = isset($admin['master']) ? $admin['master'] : null;
+
                 if ($admin['forca_senha'] === 'yes') {
-                    $_SESSION['admin_id'] = $admin['id'];
-                    $_SESSION['admin_name'] = $admin['nome'];
-                    $_SESSION['admin_email'] = $admin['email'];
-
-                    header('Location: /agendamentoDeViagens/admin/change-passwd.php');
-                    exit();
+                    header('Location: /admin/change-passwd.php');
                 } else {
-                    $_SESSION['admin_id'] = $admin['id'];
-                    $_SESSION['admin_name'] = $admin['nome'];
-                    $_SESSION['admin_email'] = $admin['email'];
-                    $_SESSION['is_master'] = $admin['master'];
-
-                    header('Location: /agendamentoDeViagens/admin/dashboard.php');
-                    exit();
+                    header('Location: /admin/dashboard.php');
                 }
+                exit();
             } else {
                 echo 'Seu usuário está desativado. Entre em contato com a TI.';
+                exit();
             }
         } else {
             echo 'Nome de usuário ou senha incorretos.';
-        } 
-    } catch (PDOException $e) {	
-        echo 'Erro ao conectar com o banco de dados'. $e->getMessage();
+            exit();
+        }
+    } catch (PDOException $e) {
+        echo 'Erro ao conectar com o banco de dados: ' . $e->getMessage();
+        exit();
     }
 } else {
-    echo 'Algo deu Errado, contate a TI.';
+    echo 'Algo deu errado, contate a TI.';
+    exit();
 }

@@ -1,7 +1,9 @@
 <?php
+ob_start();
 require_once 'db.php';
 require_once '../../config/email-config.php';
 require_once 'get-active-admins.php';
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = htmlspecialchars($_POST['nome']);
@@ -62,7 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Você receberá um e-mail quando ela for atualizada.";
 
             if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
-                echo "Erro ao enviar e-mail.";
+                echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail para o cliente.']);
+                exit();     
             }
 
             // ENVIO DE EMAIL ADMIN
@@ -75,15 +78,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Verifique no link: 192.168.0.201:50/agendamentoDeViagens/admin/dashboard.php).";
 
                 if (!($emailConfig->sendMail($adminEmail, $subjectAdmin, $bodyAdmin, $altBodyAdmin))) {
-                    echo "Erro ao enviar e-mail para administradores.";
+                    echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail para o cliente.']);
+                    exit();
                 }
             }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Erro ao criar a reserva.']);
+            exit();
         }
     } catch (PDOException $e) {
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit();
     }
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Método inválido.']);
+    exit();
+}
+$output = ob_get_clean(); // Limpa qualquer saída capturada
+if (!empty($output)) {
+    error_log("Saída inesperada: $output"); // Registra no log para análise
 }

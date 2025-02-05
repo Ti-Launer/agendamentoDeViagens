@@ -57,9 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $subject = "Reserva pendente de aprovação";
             $body = "<h1>Olá, $nome!</h1><p>Sua reserva está esperando para ser aprovada por alguém responsável.</p>
-            <p>Você receberá um e-mail como este quando ela for atualizada.</p>";
+            <p>Você receberá um e-mail como este quando ela for atualizada, portanto, fique atento!.</p>";
             $altBody = "Olá, $nome! Sua reserva está esperando para ser aprovada por alguém responsável.
-            Você receberá um e-mail quando ela for atualizada.";
+            Você receberá um e-mail quando ela for atualizada, portanto, fique atento!.";
 
             if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
                 echo "Erro ao enviar e-mail.";

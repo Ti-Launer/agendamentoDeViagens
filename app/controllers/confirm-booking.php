@@ -47,7 +47,7 @@ function confirmarReserva($id, $carro) {
                     <strong>Início:</strong> $dataInicio<br>
                     <strong>Fim:</strong> $dataFim</p>
                     <h3><strong>UTILZAR CARRO:</strong> $placaCarro - $modeloCarro.</h3>
-                    <p>Você receberá um e-mail como este quando a data estiver próxima para preencher mais informações sobre a viagem.</p>";
+                    <p>Você poderá verificar sua reserva aqui <a href=''>aqui</a>, e lembre de conferir se a quilometragem está correta!</p>";
                     $altBodyConfirmation = "Olá de novo, $nome! Sua reserva está esperando para ser aprovada por alguém responsável.
                     Você receberá um e-mail quando ela for atualizada.";
 

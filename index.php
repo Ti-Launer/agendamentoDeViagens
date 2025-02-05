@@ -1,4 +1,8 @@
-<?php ?>
+<?php 
+error_log("Resposta do servidor: " . ob_get_contents());
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -143,7 +147,13 @@
                 if (!response.ok) {
                     throw new Error('Erro na resposta do servidor');
                 }
-                return response.json();
+                return response.text();
+            })
+            .then(text => {
+                if (!text) {
+                    throw new Error('Resposta vazia do servidor');
+                }
+                return JSON.parse(text); // Converte para JSON
             })
             .then(data => {
                 // Ocultar spinner e habilitar o botão novamente

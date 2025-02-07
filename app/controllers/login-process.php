@@ -28,9 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['is_master'] = isset($admin['master']) ? $admin['master'] : null;
 
                 if ($admin['forca_senha'] === 'yes') {
-                    header('Location: /admin/change-passwd.php');
+                    header('Location: /agendamentoDeViagens/admin/change-passwd.php');
                 } else {
-                    header('Location: /admin/dashboard.php');
+                    header('Location: /agendamentoDeViagens/admin/dashboard.php');
                 }
                 exit();
             } else {

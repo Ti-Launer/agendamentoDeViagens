@@ -62,6 +62,7 @@ $cars = fetchCars();
                         <th>Tipo do Carro</th>
                         <th>Particularidade</th>
                         <th>Condição</th>
+                        <th>Quilometragem</th>
                         <th>Atualizar</th>
                         <th id="inactive-cars-header" style="display: none;">Ativar/Desativar</th>
                     </tr>
@@ -83,6 +84,7 @@ $cars = fetchCars();
                                     <?= $car['condicao'] === 'boa' ? 'Normal' : 'Manutenção'; ?>
                                 </span>
                             </td>
+                            <td><?= htmlspecialchars($car['km_atual']); ?></td>
                             <td>
                                 <?php if ($car['condicao'] === 'boa'): ?>
                                     <button class="btn btn-warning btn-sm toggle-status" data-id="<?= $car['placa']; ?>" data-status="manutencao" title="Marcar carro sob manutenção (impede pessoas de agendá-lo).">
@@ -144,6 +146,11 @@ $cars = fetchCars();
                         <div class="mb-3">
                             <label for="carDetail" class="form-label">Particularidade</label>
                             <input type="text" class="form-control" id="carDetail" name="carDetail" placeholder="Ex: Carro do João" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="carKM" class="form-label">Quilometragem</label>
+                            <input type="number" class="form-control" id="carKM" name="carKM" required>
                         </div>
                     </form>
                 </div>

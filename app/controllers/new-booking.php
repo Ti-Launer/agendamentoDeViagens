@@ -1,5 +1,4 @@
 <?php
-ob_start();
 require_once 'db.php';
 require_once '../../config/email-config.php';
 require_once 'get-active-admins.php';
@@ -10,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email']);
     $tipoReserva = htmlspecialchars($_POST['tipo_reserva']);
     $dataInicio = htmlspecialchars($_POST['data_inicio']);
-    $dataFim = isset($_POST['data_fim']) ? $_POST['data_fim'] : null;
     $tipoCarro = htmlspecialchars($_POST['tipo_carro']);
     $motivo = htmlspecialchars($_POST['motivo']);
 
@@ -19,28 +17,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo = $database->connect();
 
         if ($tipoReserva === 'curta') {
-            $sql = "INSERT INTO reservas (nome, email, tipo_reserva, data_inicio, tipo_carro, destino_motivo) 
-                    VALUES (:nome, :email, :tipoReserva, :dataInicio, :tipoCarro, :motivo)";
+            $sql = "INSERT INTO reservas (nome, email, tipo_carro, data_inicio, data_fim, destino_motivo) 
+            VALUES (:nome, :email, :tipoCarro, :dataInicio, DATE_ADD(:dataInicio, INTERVAL 2 HOUR), :motivo)";
             $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':tipoCarro', $tipoCarro);
+            $stmt->bindParam(':dataInicio', $dataInicio);
+            $stmt->bindParam(':motivo', $motivo);
         } else {
-            $sql = "INSERT INTO reservas (nome, email, tipo_reserva, data_inicio, data_fim, tipo_carro, destino_motivo) 
-                    VALUES (:nome, :email, :tipoReserva, :dataInicio, :dataFim, :tipoCarro, :motivo)";
+            $sql = "INSERT INTO reservas (nome, email, tipo_carro, data_inicio, data_fim, destino_motivo) 
+            VALUES (:nome, :email, :tipoCarro, :dataInicio, :dataFim, :motivo)";
             $stmt = $pdo->prepare($sql);
-        }
-        
-        
-        $stmt->bindParam(':nome', $nome);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':tipoReserva', $tipoReserva);
-        $stmt->bindParam(':dataInicio', $dataInicio);
-        if ($tipoReserva === 'longa' ) { 
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':tipoCarro', $tipoCarro);
+            $stmt->bindParam(':dataInicio', $dataInicio);
             $stmt->bindParam(':dataFim', $dataFim);
+            $stmt->bindParam(':motivo', $motivo);
         }
-        $stmt->bindParam(':tipoCarro', $tipoCarro);
-        $stmt->bindParam(':motivo', $motivo);
+
 
         if ($stmt->execute()) {
             $id = $pdo->lastInsertId();
+            if (!$dataFim) {
+                $sql = "SELECT data_fim FROM reservas WHERE id = :id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':id', $id);
+                $newDataFim = $stmt->execute();
+            }
+
             echo json_encode([
                 'status' => 'success',
                 'message' => 'Reserva criada com sucesso.',
@@ -93,8 +99,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Método inválido.']);
     exit();
-}
-$output = ob_get_clean(); // Limpa qualquer saída capturada
-if (!empty($output)) {
-    error_log("Saída inesperada: $output"); // Registra no log para análise
 }

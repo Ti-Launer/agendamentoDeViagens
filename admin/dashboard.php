@@ -3,7 +3,6 @@ require_once '../app/controllers/get-pending-bookings.php';
 require_once '../app/controllers/get-available-cars.php';
 require_once '../app/controllers/db.php';
 require_once 'session_verify.php';
-include "../app/models/header.php";
 ?>
 
 <!DOCTYPE html>
@@ -14,6 +13,7 @@ include "../app/models/header.php";
     <title>Gerenciar Reservas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<?= include "../app/models/header.php"; ?>
 <body>
     <div class="container mt-5">
         <h2 class="text-center mb-4">Reservas Pendentes</h2>

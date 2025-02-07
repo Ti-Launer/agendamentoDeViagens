@@ -11,15 +11,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $placa = htmlspecialchars($_POST['carPlate']);
     $tipoCarro = htmlspecialchars($_POST['carType']);
     $detalhe = htmlspecialchars($_POST['carDetail']);
+    $kmAtual = htmlspecialchars($_POST['carKM']);
 
     try {
-        $sql = 'INSERT INTO carros (modelo, placa, tipo_carro, detalhe) VALUES (:modelo, :placa, :tipo_carro, :detalhe)';
+        $sql = 'INSERT INTO carros (modelo, placa, tipo_carro, detalhe, km_atual) VALUES (:modelo, :placa, :tipo_carro, :detalhe, :km_atual)';
         $stmt = $pdo->prepare($sql);
 
         $stmt->bindParam(':modelo', $modelo);
         $stmt->bindParam(':placa', $placa);
         $stmt->bindParam(':tipo_carro', $tipoCarro);
         $stmt->bindParam(':detalhe', $detalhe);
+        $stmt->bindParam(':km_atual', $kmAtual);
 
         $stmt->execute();
         header('Content-Type: text/plain');

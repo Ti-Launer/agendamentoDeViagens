@@ -1,5 +1,4 @@
 <?php 
-error_log("Resposta do servidor: " . ob_get_contents());
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 ?>

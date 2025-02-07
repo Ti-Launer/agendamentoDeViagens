@@ -33,7 +33,7 @@ $pdo = $database->connect();
                     <li class="nav-item">
                         <a class="s nav-link" href="#" data-section="car-agenda">Agenda dos Carros</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" disabled>
                         <a class="s nav-link" href="#" data-section="report-generator">Gerador de Relatórios</a>
                     </li>
                 </ul>

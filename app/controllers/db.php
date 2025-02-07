@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "banco_adv";
+    private $host = "localhost";
     private $db_name = "agendamentoDeViagens";
-    private $username = "adv";
-    private $password = "launer@2020";
+    private $username = "root";
+    private $password = "";
     public $conn;
 
     public function connect() {

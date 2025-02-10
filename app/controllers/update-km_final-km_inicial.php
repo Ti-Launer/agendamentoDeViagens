@@ -1,34 +1,27 @@
 <?php
-require_once 'db.php';
-header('Content-Type: application/json');
+require_once 'db.php'; // Inclui o arquivo de conexão com o banco de dados
+header('Content-Type: application/json'); // Define o cabeçalho para JSON
 
-require_once 'db.php';
-header('Content-Type: application/json');
-
+// Verifica se a requisição é POST e se os parâmetros necessários estão presentes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['new_km_final'])) {
-    $id = intval($_POST['id']);
-    $newKmFinal = intval($_POST['new_km_final']);
+    $id = intval($_POST['id']); // Converte o ID para inteiro
+    $newKmFinal = intval($_POST['new_km_final']); // Converte o novo KM Final para inteiro
 
     $database = new Database();
     $pdo = $database->connect();
 
     try {
+        // Inicia uma transação para garantir atomicidade
+        $pdo->beginTransaction();
+
+        // Atualiza o KM Final da reserva atual
         $sql = "UPDATE reservas SET km_final = :new_km_final WHERE id = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':new_km_final', $newKmFinal, PDO::PARAM_INT);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        
-        if ($stmt->execute()) {
-            echo json_encode(['status' => 'success', 'message' => 'KM Final atualizado.']);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Erro ao atualizar KM Final.']);
-        }
-    } catch (PDOException $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
+        $stmt->execute();
 
-    // Atualiza o km_inicial da reserva próxima desta
-    try {
+        // Busca os dados da reserva atual
         $sql = "SELECT carro, data_fim FROM reservas WHERE id = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -36,12 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['new_km_
         $reservaAtual = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$reservaAtual) {
-            echo json_encode(['status' => 'error', 'message' => 'Reserva atual não encontrada.']);
-            exit;
+            throw new Exception("Reserva atual não encontrada.");
         }
 
-        // Agora, encontre a próxima reserva para o mesmo carro
-        // Aqui, vamos supor que 'data_inicio' ordena as reservas e a próxima reserva é aquela cujo 'data_inicio' é maior que a 'data_fim' da reserva atual
+        // Busca a próxima reserva para o mesmo carro
         $sql = "SELECT id FROM reservas 
                 WHERE carro = :carro 
                   AND data_inicio > :data_fim 
@@ -53,24 +44,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['new_km_
         $stmt->execute();
         $proximaReserva = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Se houver uma próxima reserva, atualiza o KM Inicial dela
         if ($proximaReserva) {
-            // Atualiza o km_inicial da próxima reserva com o novo km_final da reserva atual
             $sql = "UPDATE reservas SET km_inicial = :km_inicial WHERE id = :id";
             $stmt = $pdo->prepare($sql);
-          $stmt->bindParam(':km_inicial', $newKmFinal, PDO::PARAM_INT);
+            $stmt->bindParam(':km_inicial', $newKmFinal, PDO::PARAM_INT);
             $stmt->bindParam(':id', $proximaReserva['id'], PDO::PARAM_INT);
-            if ($stmt->execute()) {
-                echo json_encode(['status' => 'success', 'message' => 'Próxima reserva atualizada.']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Erro ao atualizar próxima reserva.']);
-            }
-        } else {
-            echo json_encode(['status' => 'success', 'message' => 'Nenhuma próxima reserva encontrada.']);
+            $stmt->execute();
         }
-    } catch (PDOException $e) {
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
-    }
 
+        // Confirma a transação
+        $pdo->commit();
+
+        // Retorna uma resposta de sucesso
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'KM Final e próxima reserva atualizados com sucesso.'
+        ]);
+    } catch (Exception $e) {
+        // Em caso de erro, reverte a transação
+        $pdo->rollBack();
+
+        // Retorna uma mensagem de erro
+        echo json_encode([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Parâmetros inválidos.']);
+    // Retorna um erro se os parâmetros estiverem ausentes
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Parâmetros inválidos.'
+    ]);
 }

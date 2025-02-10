@@ -14,7 +14,7 @@ $reserva = getBooking();
 <body class="bg-light">
   <div class="container mt-5">
     <div class="card shadow">
-      <div class="card-header bg-primary text-white">
+      <div class="card-header bg-dark text-white">
         <h3 class="mb-0">Reserva #<?= $reserva['id'] ?></h3>
       </div>
       <div class="card-body">
@@ -26,8 +26,7 @@ $reserva = getBooking();
             <dd class="col-sm-9"><?= $reserva['carro'] ?></dd>
             <dt class="col-sm-3">Período:</dt>
             <dd class="col-sm-9">
-              <?= htmlspecialchars($reserva['data_inicio']) ?> 
-              a 
+              <?= htmlspecialchars($reserva['data_inicio']) ?>  
               <?= htmlspecialchars($reserva['data_fim']) ?>
             </dd>
             <dt class="col-sm-3">Status:</dt>
@@ -73,7 +72,7 @@ $reserva = getBooking();
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-dark text-white">
           <h5 class="modal-title" id="confirmModalLabel">Confirmação</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>

@@ -29,7 +29,7 @@ $cars = fetchCars();
                 Adicionar Outro Carro
             </button>
         </div>
-        <?php if (isset($_SESSION['master']) && $_SESSION['master'] === 'yes'): ?>
+        <?php if (isset($_SESSION['is_master']) && $_SESSION['is_master'] === 'yes'): ?>
             <div class="form-check mb-4">
                 <input type="checkbox" class="form-check-input" id="showInactiveCars" name="showInactiveCars" onchange="toggleInactiveCars()">
                 <label class="form-check-label" for="showInactiveCars">

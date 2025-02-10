@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 26, 2024 at 12:17 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Tempo de geração: 10/02/2025 às 17:43
+-- Versão do servidor: 10.4.28-MariaDB
+-- Versão do PHP: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `agendamentoDeViagens`
+-- Banco de dados: `agendamentoDeViagens`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admins`
+-- Estrutura para tabela `admins`
 --
 
 CREATE TABLE `admins` (
@@ -38,18 +38,11 @@ CREATE TABLE `admins` (
   `ativo` enum('yes','no') NOT NULL DEFAULT 'yes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `admins`
---
-
-INSERT INTO `admins` (`id`, `nome`, `username`, `email`, `senha`, `master`, `forca_senha`, `ativo`) VALUES
-(3, 'Diogo Augusto Wermann', 'diogo-augusto-wermann', 'ti@launer.com.br', '$2y$10$NvQPoyWzWXxrU.TWrWt2lOEKdJV95xx1s3BmKv/zuf7STezlK0Ece', 'yes', 'no', 'yes');
-
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `admins_ativos`
--- (See below for the actual view)
+-- Estrutura stand-in para view `admins_ativos`
+-- (Veja abaixo para a visão atual)
 --
 CREATE TABLE `admins_ativos` (
 `id` int(11)
@@ -65,7 +58,7 @@ CREATE TABLE `admins_ativos` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `agenda_carros`
+-- Estrutura para tabela `agenda_carros`
 --
 
 CREATE TABLE `agenda_carros` (
@@ -81,7 +74,7 @@ CREATE TABLE `agenda_carros` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `carros`
+-- Estrutura para tabela `carros`
 --
 
 CREATE TABLE `carros` (
@@ -90,14 +83,15 @@ CREATE TABLE `carros` (
   `detalhe` text NOT NULL,
   `condicao` enum('boa','manutencao') NOT NULL DEFAULT 'boa',
   `ativo` tinyint(1) NOT NULL DEFAULT 1,
-  `tipo_carro` enum('carga','passeio') NOT NULL
+  `tipo_carro` enum('carga','passeio') NOT NULL,
+  `km_atual` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `carros_disponiveis`
--- (See below for the actual view)
+-- Estrutura stand-in para view `carros_disponiveis`
+-- (Veja abaixo para a visão atual)
 --
 CREATE TABLE `carros_disponiveis` (
 `placa` varchar(7)
@@ -111,7 +105,7 @@ CREATE TABLE `carros_disponiveis` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reservas`
+-- Estrutura para tabela `reservas`
 --
 
 CREATE TABLE `reservas` (
@@ -124,13 +118,13 @@ CREATE TABLE `reservas` (
   `tipo_carro` enum('carga','passeio','indiferente') NOT NULL,
   `carro` varchar(7) DEFAULT NULL,
   `destino_motivo` text NOT NULL,
-  `status` enum('pendente','confirmado','cancelado') NOT NULL DEFAULT 'pendente',
+  `status` enum('pendente','confirmado','cancelado','fechada') NOT NULL DEFAULT 'pendente',
   `km_inicial` float DEFAULT NULL,
   `km_final` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Triggers `reservas`
+-- Acionadores `reservas`
 --
 DELIMITER $$
 CREATE TRIGGER `after_reserva_confirmada` AFTER UPDATE ON `reservas` FOR EACH ROW BEGIN
@@ -143,22 +137,12 @@ CREATE TRIGGER `after_reserva_confirmada` AFTER UPDATE ON `reservas` FOR EACH RO
 END
 $$
 DELIMITER ;
-DELIMITER $$
-CREATE TRIGGER `set_data_fim_after_insert_if_curta` BEFORE INSERT ON `reservas` FOR EACH ROW BEGIN
-    -- Verifica se o tipo de reserva é 'curta' (valor 0)
-    IF NEW.tipo_reserva = 'curta' THEN
-        -- Calcula data_fim como 2 horas após data_inicio
-        SET NEW.data_fim = DATE_ADD(NEW.data_inicio, INTERVAL 2 HOUR);
-    END IF;
-END
-$$
-DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Stand-in structure for view `reservas_pendentes`
--- (See below for the actual view)
+-- Estrutura stand-in para view `reservas_pendentes`
+-- (Veja abaixo para a visão atual)
 --
 CREATE TABLE `reservas_pendentes` (
 `id` bigint(20) unsigned
@@ -169,14 +153,14 @@ CREATE TABLE `reservas_pendentes` (
 ,`data_fim` datetime
 ,`tipo_carro` enum('carga','passeio','indiferente')
 ,`carro` varchar(7)
-,`status` enum('pendente','confirmado','cancelado')
+,`status` enum('pendente','confirmado','cancelado','fechada')
 ,`tipo_reserva` enum('curta','longa')
 );
 
 -- --------------------------------------------------------
 
 --
--- Structure for view `admins_ativos`
+-- Estrutura para view `admins_ativos`
 --
 DROP TABLE IF EXISTS `admins_ativos`;
 
@@ -185,7 +169,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `carros_disponiveis`
+-- Estrutura para view `carros_disponiveis`
 --
 DROP TABLE IF EXISTS `carros_disponiveis`;
 
@@ -194,37 +178,37 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Structure for view `reservas_pendentes`
+-- Estrutura para view `reservas_pendentes`
 --
 DROP TABLE IF EXISTS `reservas_pendentes`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `reservas_pendentes`  AS SELECT `r`.`id` AS `id`, `r`.`nome` AS `nome`, `r`.`email` AS `email`, `r`.`destino_motivo` AS `destino_motivo`, `r`.`data_inicio` AS `data_inicio`, `r`.`data_fim` AS `data_fim`, `r`.`tipo_carro` AS `tipo_carro`, `r`.`carro` AS `carro`, `r`.`status` AS `status`, `r`.`tipo_reserva` AS `tipo_reserva` FROM `reservas` AS `r` WHERE `r`.`status` = 'pendente' ;
 
 --
--- Indexes for dumped tables
+-- Índices para tabelas despejadas
 --
 
 --
--- Indexes for table `admins`
+-- Índices de tabela `admins`
 --
 ALTER TABLE `admins`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `agenda_carros`
+-- Índices de tabela `agenda_carros`
 --
 ALTER TABLE `agenda_carros`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `carros`
+-- Índices de tabela `carros`
 --
 ALTER TABLE `carros`
   ADD PRIMARY KEY (`placa`);
 
 --
--- Indexes for table `reservas`
+-- Índices de tabela `reservas`
 --
 ALTER TABLE `reservas`
   ADD PRIMARY KEY (`id`),
@@ -232,33 +216,33 @@ ALTER TABLE `reservas`
   ADD KEY `reservas_status_idx` (`status`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT para tabelas despejadas
 --
 
 --
--- AUTO_INCREMENT for table `admins`
+-- AUTO_INCREMENT de tabela `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `agenda_carros`
+-- AUTO_INCREMENT de tabela `agenda_carros`
 --
 ALTER TABLE `agenda_carros`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `reservas`
+-- AUTO_INCREMENT de tabela `reservas`
 --
 ALTER TABLE `reservas`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- Restrições para tabelas despejadas
 --
 
 --
--- Constraints for table `reservas`
+-- Restrições para tabelas `reservas`
 --
 ALTER TABLE `reservas`
   ADD CONSTRAINT `fk_carro` FOREIGN KEY (`carro`) REFERENCES `carros` (`placa`) ON DELETE SET NULL ON UPDATE CASCADE;

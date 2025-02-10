@@ -54,7 +54,32 @@ $pdo = $database->connect();
         </div>
     </div>
 
+    <!-- Modal para editar KM Final -->
+    <div class="modal fade" id="editKmModal" tabindex="-1" aria-labelledby="editKmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-secondary text-white">
+                    <h5 class="modal-title" id="editKmModalLabel">Editar KM Final</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editKmForm">
+                        <div class="mb-3">
+                            <label for="newKmFinal" class="form-label">Novo KM Final</label>
+                            <input type="number" class="form-control" id="newKmFinal" name="newKmFinal" required>
+                        </div>
+                        <input type="hidden" id="reservaId" name="reservaId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveKmBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 <script>
@@ -142,6 +167,55 @@ $pdo = $database->connect();
                     loadSection(currentSectionFile, currentSection, queryParams);
                 }
             }
+
+            // Configuração do Modal de Edição
+            const editKmModalElement = document.getElementById("editKmModal");
+            if (editKmModalElement) {
+                const editKmModal = new bootstrap.Modal(editKmModalElement);
+                const saveKmBtn = document.getElementById("saveKmBtn");
+
+            // Configura o evento de clique nos botões "Editar KM"
+                currentSection.addEventListener("click", function (event) {
+                    const btn = event.target.closest(".edit-km");
+                    if (btn) {
+                        event.preventDefault();
+                        const reservaId = btn.dataset.reservaId;
+                        document.getElementById("reservaId").value = reservaId;
+                        const kmFinalElem = document.getElementById(`kmFinal${reservaId}`);
+                        document.getElementById("newKmFinal").value = kmFinalElem?.textContent.trim() || "";
+                        editKmModal.show();
+                    }
+                });
+
+            // Configura o evento de salvar
+                saveKmBtn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const newKmFinal = document.getElementById("newKmFinal").value.trim();
+                    const reservaId = document.getElementById("reservaId").value;
+
+                    if (!newKmFinal || isNaN(newKmFinal)) {
+                        alert("Insira um valor numérico válido.");
+                            return;
+                    }
+
+                    fetch("../app/controllers/update-km_final-km_inicial.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({ id: reservaId, new_km_final: newKmFinal })
+                    })
+                    .then(response => response.json())
+                        .then(data => {
+                        if (data.status === "success") {
+                            const kmFinalElem = document.getElementById(`kmFinal${reservaId}`);
+                        if (kmFinalElem) kmFinalElem.textContent = newKmFinal;
+                            editKmModal.hide();
+                        } else {
+                            alert("Erro: " + data.message);
+                        }
+                        })
+                    .catch(error => console.error("Erro:", error));
+                });
+            }
         }
 
         // Adiciona eventos de clique nos links
@@ -173,6 +247,8 @@ $pdo = $database->connect();
                 // Reaplica os filtros ao carregar a seção
                 const queryParams = new URLSearchParams(currentFilters).toString();
                 loadSection(sectionFile, targetSection, queryParams ? '?' + queryParams : '');
+
+                
             });
         });
 
@@ -180,6 +256,7 @@ $pdo = $database->connect();
         activateSection('booking-history'); // Ativa a seção inicial
         loadSection('../app/views/booking-history.php', document.getElementById('booking-history'));
     });
+    
 </script>
 
 

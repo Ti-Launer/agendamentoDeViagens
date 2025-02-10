@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_id'] = $admin['id'];
                 $_SESSION['admin_name'] = $admin['nome'];
                 $_SESSION['admin_email'] = $admin['email'];
-                $_SESSION['is_master'] = isset($admin['master']) ? $admin['master'] : null;
+                $_SESSION['is_master'] = $admin['master'];
 
                 if ($admin['forca_senha'] === 'yes') {
                     header('Location: /agendamentoDeViagens/admin/change-passwd.php');

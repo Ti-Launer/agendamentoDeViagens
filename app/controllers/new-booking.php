@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = htmlspecialchars($_POST['email']);
     $tipoReserva = htmlspecialchars($_POST['tipo_reserva']);
     $dataInicio = htmlspecialchars($_POST['data_inicio']);
+    if ($tipoReserva === 'longa') $dataFim = htmlspecialchars($_POST['data_fim']);
     $tipoCarro = htmlspecialchars($_POST['tipo_carro']);
     $motivo = htmlspecialchars($_POST['motivo']);
 
@@ -17,21 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo = $database->connect();
 
         if ($tipoReserva === 'curta') {
-            $sql = "INSERT INTO reservas (nome, email, tipo_carro, data_inicio, data_fim, destino_motivo) 
-            VALUES (:nome, :email, :tipoCarro, :dataInicio, DATE_ADD(:dataInicio, INTERVAL 2 HOUR), :motivo)";
+            $sql = "INSERT INTO reservas (nome, email, tipo_carro, tipo_reserva, data_inicio, data_fim, destino_motivo) 
+            VALUES (:nome, :email, :tipoCarro, :tipoReserva, :dataInicio, DATE_ADD(:dataInicio, INTERVAL 2 HOUR), :motivo)";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':nome', $nome);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':tipoCarro', $tipoCarro);
+            $stmt->bindParam(':tipoReserva', $tipoReserva);
             $stmt->bindParam(':dataInicio', $dataInicio);
             $stmt->bindParam(':motivo', $motivo);
-        } else {
-            $sql = "INSERT INTO reservas (nome, email, tipo_carro, data_inicio, data_fim, destino_motivo) 
-            VALUES (:nome, :email, :tipoCarro, :dataInicio, :dataFim, :motivo)";
+        } elseif ($tipoReserva === 'longa') {
+            $sql = "INSERT INTO reservas (nome, email, tipo_carro, tipo_reserva, data_inicio, data_fim, destino_motivo) 
+            VALUES (:nome, :email, :tipoCarro, :tipoReserva, :dataInicio, :dataFim, :motivo)";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':nome', $nome);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':tipoCarro', $tipoCarro);
+            $stmt->bindParam(':tipoReserva', $tipoReserva);
             $stmt->bindParam(':dataInicio', $dataInicio);
             $stmt->bindParam(':dataFim', $dataFim);
             $stmt->bindParam(':motivo', $motivo);

@@ -6,7 +6,8 @@ try {
 } catch (Exception $e) {
     echo "Erro ao conectar ao banco de dados: " . $e->getMessage();
 }
-function fetchCars() {
+function fetchCars()
+{
     $database = new Database();
     $pdo = $database->connect();
 

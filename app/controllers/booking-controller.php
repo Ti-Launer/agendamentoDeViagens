@@ -1,13 +1,14 @@
 <?php
 require_once 'db.php';
 
-function getBooking() {
+function getBooking()
+{
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
-    
+
         // Validar o 'id' para garantir que é um número inteiro
         $id = filter_var($id, FILTER_VALIDATE_INT);
-    
+
         if ($id === false) {
             die("ID inválido.");
         }

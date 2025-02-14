@@ -27,6 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header('Content-Type: text/plain');
         echo "Novo Carro adicionado com sucesso!";
     } catch (PDOException $e) {
-        echo "Erro ao adicionar Novo Carro". $e->getMessage();
+        echo "Erro ao adicionar Novo Carro" . $e->getMessage();
     }
 }

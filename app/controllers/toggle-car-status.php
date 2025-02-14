@@ -7,8 +7,8 @@ $database = new Database();
 $pdo = $database->connect();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $carId= $_POST['carId'];
-    $newStatus= $_POST['newStatus'];
+    $carId = $_POST['carId'];
+    $newStatus = $_POST['newStatus'];
 
     try {
         $sql = 'UPDATE carros SET condicao = :newStatus WHERE placa = :carId';
@@ -21,12 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $stmt->execute();
         header('Content-Type: application/json');
-        echo json_encode(['message'=> 'Status atualizado com sucesso!']);
+        echo json_encode(['message' => 'Status atualizado com sucesso!']);
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error'=> 'Erro ao atualizar status: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Erro ao atualizar status: ' . $e->getMessage()]);
     }
 } else {
     http_response_code(405);
-    echo json_encode(['error'=> 'Método não permitido']);
+    echo json_encode(['error' => 'Método não permitido']);
 }

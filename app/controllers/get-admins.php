@@ -1,6 +1,7 @@
 <?php
 require_once "db.php";
-function fetchAdmins() {
+function fetchAdmins()
+{
     $database = new Database();
     $pdo = $database->connect();
 

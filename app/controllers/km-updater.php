@@ -30,12 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->bindParam(':km_final', $km_final, PDO::PARAM_INT);
-    
+
     if (!$stmt->execute()) {
         error_log("Falha ao atualizar km_final da reserva id: " . $id);
     } else {
         error_log("Reserva id " . $id . " atualizada com km_final: " . $km_final);
-        
+
         // Só atualiza as reservas confirmadas se a atualização da reserva atual foi bem-sucedida
         $sql = "UPDATE reservas SET km_inicial = :km_final WHERE status = 'confirmado' AND carro = :carro";
         $stmt = $conn->prepare($sql);
@@ -61,4 +61,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 } else {
     error_log("Método inválido ou id não definido.");
 }
-?>

@@ -9,10 +9,11 @@ $cars = fetchCars();
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Administrador</title>
+    <title>Gerenciamento De Reservas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .display-none {
@@ -20,6 +21,7 @@ $cars = fetchCars();
         }
     </style>
 </head>
+
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="text-center mb-4">Carros</h2>
@@ -69,7 +71,7 @@ $cars = fetchCars();
                 </thead>
                 <tbody>
                     <?php foreach ($cars as $car): ?>
-                        <tr class="<?= $car['ativo'] === 'no' ? 'inactive-car display-none' : '';?>">
+                        <tr class="<?= $car['ativo'] === 'no' ? 'inactive-car display-none' : ''; ?>">
                             <td><?= htmlspecialchars($car['modelo']); ?></td>
                             <td><?= htmlspecialchars($car['placa']); ?></td>
                             <td>
@@ -128,7 +130,7 @@ $cars = fetchCars();
                             <label for="carModel" class="form-label">Modelo</label>
                             <input type="text" class="form-control" id="carModel" name="carModel" placeholder="Ex: Saveiro" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="carPlate" class="form-label">Placa</label>
                             <input type="text" class="form-control" id="carPlate" name="carPlate" placeholder="Ex: ABC1D23" required>
@@ -136,13 +138,13 @@ $cars = fetchCars();
 
                         <div class="mb-3">
                             <label for="carType" class="form-label">Tipo de Aplicação</label>
-                                <select class="form-select" id="carType" name="carType" required>
-                                    <option value="" disabled selected>Selecione...</option>
-                                    <option value="carga" data-bs-toggle="tooltip">Carga</option>
-                                    <option value="passeio" data-bs-toggle="tooltip">Passeio</option>
-                                </select>
+                            <select class="form-select" id="carType" name="carType" required>
+                                <option value="" disabled selected>Selecione...</option>
+                                <option value="carga" data-bs-toggle="tooltip">Carga</option>
+                                <option value="passeio" data-bs-toggle="tooltip">Passeio</option>
+                            </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="carDetail" class="form-label">Particularidade</label>
                             <input type="text" class="form-control" id="carDetail" name="carDetail" placeholder="Ex: Carro do João" required>
@@ -169,29 +171,29 @@ $cars = fetchCars();
             const formData = new FormData(this);
 
             fetch('../app/controllers/insert-car.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na resposta do servidor')
-                }
-                return response.text();
-            })
-            .then(data => {
-                alert(data);
-                if (data.includes('sucesso')) {
-                    const modalElement = document.getElementById('addCarModal');
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                    modalInstance.hide();
-                    document.getElementById('addCarForm').reset();
-                    location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao enviar dados: ', error);
-                alert('Erro ao adicionar um Novo Carro. Verifique o console ou contate a TI.');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor')
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    alert(data);
+                    if (data.includes('sucesso')) {
+                        const modalElement = document.getElementById('addCarModal');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide();
+                        document.getElementById('addCarForm').reset();
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar dados: ', error);
+                    alert('Erro ao adicionar um Novo Carro. Verifique o console ou contate a TI.');
+                });
         });
 
         // Toggle Status
@@ -201,30 +203,30 @@ $cars = fetchCars();
                 const newStatus = this.getAttribute('data-status');
 
                 fetch('../app/controllers/toggle-car-status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        carId: carId,
-                        newStatus: newStatus
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            carId: carId,
+                            newStatus: newStatus
+                        })
                     })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro na resposta do servidor');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Erro ao atualizar status: ', error);
-                    alert('Erro ao atualizar status. Verifique o console.')
-                });
-                    
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na resposta do servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar status: ', error);
+                        alert('Erro ao atualizar status. Verifique o console.')
+                    });
+
             });
         });
 
@@ -235,34 +237,35 @@ $cars = fetchCars();
                 const newStatus = this.getAttribute('data-status');
 
                 fetch('../app/controllers/toggle-car-usage.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        carId: carId,
-                        newStatus: newStatus
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            carId: carId,
+                            newStatus: newStatus
+                        })
                     })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro na resposta do servidor');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Erro ao atualizar status: ', error);
-                    alert('Erro ao atualizar status. Verifique o console.')
-                });
-                    
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na resposta do servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar status: ', error);
+                        alert('Erro ao atualizar status. Verifique o console.')
+                    });
+
             });
         });
     </script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

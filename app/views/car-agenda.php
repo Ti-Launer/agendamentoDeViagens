@@ -37,8 +37,8 @@ try {
             <select id="carSelect" name="carro" class="form-select">
                 <option value="" selected>Todos</option>
                 <?php
-                    $carros = fetchCars();
-                    foreach ($carros as $carro): ?>
+                $carros = fetchCars();
+                foreach ($carros as $carro): ?>
                     <option value="<?= htmlspecialchars($carro['placa']) ?>" <?= isset($_GET['carro']) && $_GET['carro'] == $carro['placa'] ? 'selected' : '' ?>>
                         <?= htmlspecialchars($carro['modelo'] . ' - ' . $carro['placa']) ?>
                     </option>

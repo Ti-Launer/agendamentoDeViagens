@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 10/02/2025 às 17:43
+-- Tempo de geração: 10/02/2025 às 18:20
 -- Versão do servidor: 10.4.28-MariaDB
 -- Versão do PHP: 8.2.4
 
@@ -37,6 +37,13 @@ CREATE TABLE `admins` (
   `forca_senha` enum('yes','no') NOT NULL,
   `ativo` enum('yes','no') NOT NULL DEFAULT 'yes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `admins`
+--
+
+INSERT INTO `admins` (`id`, `nome`, `username`, `email`, `senha`, `master`, `forca_senha`, `ativo`) VALUES
+(1, 'Administrador', 'administrador', 'ti@launer.com.br', '$2y$10$kQBaOe.ihTqQNc.r49e0cu9gFIxExER0teIVAUaaT2HDZGjBrgXzW', 'yes', 'no', 'yes');
 
 -- --------------------------------------------------------
 
@@ -223,7 +230,7 @@ ALTER TABLE `reservas`
 -- AUTO_INCREMENT de tabela `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de tabela `agenda_carros`

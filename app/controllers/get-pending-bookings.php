@@ -1,6 +1,7 @@
 <?php
 require_once "db.php";
-function fetchPendingReservations() {
+function fetchPendingReservations()
+{
 
     $database = new Database();
     $pdo = $database->connect();

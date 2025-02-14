@@ -8,8 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = htmlspecialchars($_POST['nome']);
     $email = htmlspecialchars($_POST['email']);
     $tipoReserva = htmlspecialchars($_POST['tipo_reserva']);
-    $dataInicio = htmlspecialchars($_POST['data_inicio']);
-    if ($tipoReserva === 'longa') $dataFim = htmlspecialchars($_POST['data_fim']);
+    $dataInicio = str_replace("T", " ", htmlspecialchars($_POST['data_inicio']));
+    $dataFim = null;
+    if ($tipoReserva === 'longa') {
+        $dataFim = str_replace("T", " ", htmlspecialchars($_POST['data_fim']));
+    }
     $tipoCarro = htmlspecialchars($_POST['tipo_carro']);
     $motivo = htmlspecialchars($_POST['motivo']);
 
@@ -47,22 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql = "SELECT data_fim FROM reservas WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(':id', $id);
-                $newDataFim = $stmt->execute();
+                $stmt->execute();
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $dataFim = $row['data_fim'];
             }
 
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Reserva criada com sucesso.',
-                'id' => $id,
-                'nome' => $nome,
-                'email' => $email,
-                'tipo_reserva' => $tipoReserva,
-                'data_inicio' => $dataInicio,
-                'data_fim' => $dataFim,
-                'tipo_carro' => $tipoCarro,
-                'motivo' => $motivo
-            ]);
-              
             $emailConfig = new EmailConfig();
             // ENVIO DE EMAIL CLIENTE
 
@@ -74,22 +66,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
                 echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail para o cliente.']);
-                exit();     
+                exit();
             }
 
             // ENVIO DE EMAIL ADMIN
-            fetchActiveAdmins();
+            $adminEmails = fetchActiveAdmins();
             foreach ($adminEmails as $adminEmail) {
                 $subjectAdmin = "Nova reserva pendente de aprovação";
                 $bodyAdmin = "<h1>Reserva de $nome!</h1><p>Há uma reserva esperando para ser aprovada.</p>
-                    <p>Verifique no link <a href='localhost/agendamentoDeViagens/admin/dashboard.php'>AQUI</a>.</p>";
+                    <p>Verifique no link <a href='192.168.0.201:50/agendamentoDeViagens/admin/dashboard.php'>AQUI</a>.</p>";
                 $altBodyAdmin = "Reserva de $nome! Há uma reserva esperando para ser aprovada.
                     Verifique no link: 192.168.0.201:50/agendamentoDeViagens/admin/dashboard.php).";
 
                 if (!($emailConfig->sendMail($adminEmail, $subjectAdmin, $bodyAdmin, $altBodyAdmin))) {
-                    echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail para o cliente.']);
+                    echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail para o administrador.']);
                     exit();
                 }
+
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Reserva criada com sucesso.',
+                    'id' => $id,
+                    'nome' => $nome,
+                    'email' => $email,
+                    'tipo_reserva' => $tipoReserva,
+                    'data_inicio' => $dataInicio,
+                    'data_fim' => $dataFim,
+                    'tipo_carro' => $tipoCarro,
+                    'motivo' => $motivo
+                ]);
+                exit();
             }
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Erro ao criar a reserva.']);

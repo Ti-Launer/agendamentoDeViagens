@@ -7,6 +7,7 @@ require_once 'session_verify.php';
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +15,10 @@ require_once 'session_verify.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <?= include "../app/models/header.php"; ?>
+
 <body>
     <div class="container mt-5">
-        <h2 class="text-center mb-4">Reservas Pendentes</h2>
+        <h2 class="text-center mb-4">Gerenciamento De Reservas</h2>
         <div class="row justify-content-center">
             <?php if (empty($reservasPendentes)): ?>
                 <div class="col-12 text-center">
@@ -79,88 +81,98 @@ require_once 'session_verify.php';
         </div>
     </div>
     <script>
-    function toggleLoading(button, isLoading) {
-        if (isLoading) {
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processando...';
-        } else {
-            button.disabled = false;
-            button.innerHTML = button.dataset.originalText;
-        }
-    }
-
-    function confirmarReserva(id) {
-        const carSelect = document.getElementById(`carSelect${id}`);
-        const selectedCarPlaca = carSelect.value;
-        const button = event.target;
-
-        if (!selectedCarPlaca) {
-            alert("Por favor, selecione um carro antes de confirmar a reserva.");
-            return;
+        function toggleLoading(button, isLoading) {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processando...';
+            } else {
+                button.disabled = false;
+                button.innerHTML = button.dataset.originalText;
+            }
         }
 
-        button.dataset.originalText = button.innerHTML;
-        toggleLoading(button, true);
+        function confirmBooking(id) {
+            const carSelect = document.getElementById(`carSelect${id}`);
+            const selectedCarPlaca = carSelect.value;
+            const button = event.target;
 
-        fetch('../app/controllers/confirm-booking.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, carro: selectedCarPlaca })
-        })
-        .then(response => response.json())
-        .then(data => {
-            toggleLoading(button, false);
-            if (data.status === 'success') {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert("Erro: " + data.message);
+            if (!selectedCarPlaca) {
+                alert("Por favor, selecione um carro antes de confirmar a reserva.");
+                return;
             }
-        });
-    }
+
+            button.dataset.originalText = button.innerHTML;
+            toggleLoading(button, true);
+
+            fetch('../app/controllers/confirm-booking.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id,
+                        carro: selectedCarPlaca
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(button, false);
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert("Erro: " + data.message);
+                    }
+                });
+        }
 
 
-    function cancelarReserva(id) {
-        const confirmarBtn = document.getElementById('confirmarCancelamento');
-        confirmarBtn.dataset.id = id;
+        function cancelarReserva(id) {
+            const confirmarBtn = document.getElementById('confirmarCancelamento');
+            confirmarBtn.dataset.id = id;
 
-        const modal = new bootstrap.Modal(document.getElementById('modalCancelamento'));
-        modal.show();
-    }
+            const modal = new bootstrap.Modal(document.getElementById('modalCancelamento'));
+            modal.show();
+        }
 
-    document.getElementById('confirmarCancelamento').addEventListener('click', function() {
-        const id = this.dataset.id;
-        const mensagemCancelamento = document.getElementById('mensagemCancelamento').value;
+        document.getElementById('confirmarCancelamento').addEventListener('click', function() {
+            const id = this.dataset.id;
+            const mensagemCancelamento = document.getElementById('mensagemCancelamento').value;
 
-        if (!mensagemCancelamento) {
-            alert("Por favor, insira uma mensagem de cancelamento.");
-            return;
-    }
-
-        const button = this;
-        toggleLoading(button, true);
-
-        fetch('../app/controllers/cancel-booking.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, mensagemCancelamento })
-        })
-        .then(response => response.json())
-        .then(data => {
-            toggleLoading(button, false);
-            if (data.status === 'success') {
-                alert("Reserva cancelada!");
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelamento'));
-                modal.hide();
-                location.reload(); // Recarrega a página após fechar o modal
-            } else {
-                alert("Erro ao cancelar reserva: " + data.message);
+            if (!mensagemCancelamento) {
+                alert("Por favor, insira uma mensagem de cancelamento.");
+                return;
             }
-        });
-    });
 
+            const button = this;
+            toggleLoading(button, true);
+
+            fetch('../app/controllers/cancel-booking.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id,
+                        mensagemCancelamento
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(button, false);
+                    if (data.status === 'success') {
+                        alert("Reserva cancelada!");
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelamento'));
+                        modal.hide();
+                        location.reload(); // Recarrega a página após fechar o modal
+                    } else {
+                        alert("Erro ao cancelar reserva: " + data.message);
+                    }
+                });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

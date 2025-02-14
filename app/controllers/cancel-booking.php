@@ -1,7 +1,8 @@
 <?php
 require_once 'db.php';
-require_once './config/email-config.php';
-function cancelarReserva($id, $mensagemCancelamento) {
+require_once '../../config/email-config.php';
+function cancelarReserva($id, $mensagemCancelamento)
+{
     $database = new Database();
     $pdo = $database->connect();
 
@@ -23,18 +24,17 @@ function cancelarReserva($id, $mensagemCancelamento) {
             if ($reserva) {
                 $nome = $reserva['nome'];
                 $email = $reserva['email'];
-                
+
                 $emailConfig = new EmailConfig();
                 // ENVIO DE EMAIL CLIENTE
                 $subject = "Reserva cancelada";
                 $body = "<h1>Olá, $nome!</h1><p>$mensagemCancelamento</p>";
                 $altBody = "Olá, $nome! $mensagemCancelamento";
-                
+
                 if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
                     echo "Erro ao enviar e-mail.";
                 }
             }
-
         }
 
         return ['status' => 'success', 'message' => 'Reserva cancelada.'];

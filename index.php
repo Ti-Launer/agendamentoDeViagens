@@ -1,16 +1,18 @@
-<?php 
+<?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva de Viagem</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="card shadow-lg" style="width: 100%; max-width: 500px;" id="formElement">
@@ -76,7 +78,7 @@ error_reporting(E_ALL);
                 </form>
             </div>
         </div>
-        
+
         <div class="modal fade" style="display: none;" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -139,31 +141,31 @@ error_reporting(E_ALL);
             document.getElementById('submitBtn').disabled = true;
 
             fetch('app/controllers/new-booking.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na resposta do servidor');
-                }
-                return response.text();
-            })
-            .then(text => {
-                if (!text) {
-                    throw new Error('Resposta vazia do servidor');
-                }
-                return JSON.parse(text); // Converte para JSON
-            })
-            .then(data => {
-                // Ocultar spinner e habilitar o botão novamente
-                document.getElementById('spinner').classList.add('d-none');
-                document.getElementById('submitBtn').disabled = false;
-                if (data.status === 'success') {
-                    const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
-                    const modalBody = document.getElementById('modalBody');
-                    modalBody.innerHTML = `
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    if (!text) {
+                        throw new Error('Resposta vazia do servidor');
+                    }
+                    return JSON.parse(text); // Converte para JSON
+                })
+                .then(data => {
+                    // Ocultar spinner e habilitar o botão novamente
+                    document.getElementById('spinner').classList.add('d-none');
+                    document.getElementById('submitBtn').disabled = false;
+                    if (data.status === 'success') {
+                        const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+                        const modalBody = document.getElementById('modalBody');
+                        modalBody.innerHTML = `
                         <p><strong>Nome:</strong> ${data.nome}</p>
-                        <p><strong>E-mail:</strong> ${data.email}</vp>
+                        <p><strong>E-mail:</strong> ${data.email}</p>
                         <p><strong>Tipo de Reserva:</strong> ${data.tipo_reserva === 'longa' ? 'Viagem Longa' : 'Viagem Curta'}</p>
                         <p><strong>Data de Início:</strong> ${data.data_inicio}</p>
                         ${data.tipo_reserva === 'longa' ? `<p><strong>Data de Fim:</strong> ${data.data_fim}</p>`: '' /*caso seja do tipo curta, não aparece*/}
@@ -172,28 +174,29 @@ error_reporting(E_ALL);
                         <p class="text-danger"><strong>Você receberá um email para poder acompanhar esta reserva</strong></p>
                     `;
 
-                    const formElement = document.getElementById('formElement');
-                    formElement.style.display = 'none';
+                        const formElement = document.getElementById('formElement');
+                        formElement.style.display = 'none';
 
-                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-                    successModal.show();
+                        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                        successModal.show();
 
-                    document.getElementById('addBookingForm').reset();
-                    toggleFields();
-                } else {
-                    alert(data.message || 'Erro ao processar a reserva.');
-                }
-            })
-            .catch(error => { // Ocultar spinner e habilitar o botão novamente
-                document.getElementById('spinner').classList.add('d-none');
-                document.getElementById('submitBtn').disabled = false;
-                
-                console.error('Erro ao enviar dados: ', error);
-                alert('Erro ao processar a reserva. Verifique o console.');
-            });
+                        document.getElementById('addBookingForm').reset();
+                        toggleFields();
+                    } else {
+                        alert(data.message || 'Erro ao processar a reserva.');
+                    }
+                })
+                .catch(error => { // Ocultar spinner e habilitar o botão novamente
+                    document.getElementById('spinner').classList.add('d-none');
+                    document.getElementById('submitBtn').disabled = false;
+
+                    console.error('Erro ao enviar dados: ', error);
+                    alert('Erro ao processar a reserva. Verifique o console.');
+                });
         });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

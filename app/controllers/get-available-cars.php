@@ -1,7 +1,8 @@
 <?php
 require_once "db.php";
 
-function getAvailableCars($tipoCarro, $dataInicio, $dataFim) {
+function getAvailableCars($tipoCarro, $dataInicio, $dataFim)
+{
     $database = new Database();
     $pdo = $database->connect();
 
@@ -27,7 +28,7 @@ function getAvailableCars($tipoCarro, $dataInicio, $dataFim) {
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':data_inicio', $dataInicio, PDO::PARAM_STR);
         $stmt->bindValue(':data_fim', $dataFim, PDO::PARAM_STR);
-        
+
         // Só vincula o parâmetro se for necessário
         if ($tipoCarro !== 'indiferente') {
             $stmt->bindValue(':tipo_carro', $tipoCarro, PDO::PARAM_STR);

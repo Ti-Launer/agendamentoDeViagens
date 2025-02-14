@@ -7,9 +7,8 @@ try {
     echo "Erro ao conectar ao banco de dados: " . $e->getMessage();
 }
 
-$adminEmails = [];
-function fetchActiveAdmins() {
-    global $adminEmails;
+function fetchActiveAdmins()
+{
     $database = new Database();
     $pdo = $database->connect();
 
@@ -18,7 +17,7 @@ function fetchActiveAdmins() {
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
 
-        $adminEmails = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     } catch (PDOException $e) {
         echo "Erro ao buscar carros: " . $e->getMessage();
         return [];

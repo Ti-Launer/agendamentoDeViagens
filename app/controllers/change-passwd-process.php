@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Nenhuma alteração foi feita. Verifique seus dados.";
         }
         exit();
-
     } catch (PDOException $e) {
         echo "Erro ao atualizar senha: " . $e->getMessage();
     }

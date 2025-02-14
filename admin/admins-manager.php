@@ -11,12 +11,14 @@ $admins = fetchAdmins();
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Administrador</title>
+    <title>Gerenciamento De Reservas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="text-center mb-4">Gerenciar Administradores</h2>
@@ -81,17 +83,17 @@ $admins = fetchAdmins();
                             <label for="adminName" class="form-label">Nome Completo</label>
                             <input type="text" class="form-control" id="adminName" name="adminName" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="adminEmail" class="form-label">E-mail</label>
                             <input type="email" class="form-control" id="adminEmail" name="adminEmail" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="adminPassword" class="form-label">Senha</label>
                             <input type="password" class="form-control" id="adminPassword" name="adminPassword" required>
                         </div>
-                        
+
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="forcePasswordChange" name="forcePasswordChange">
                             <label class="form-check-label" for="forcePasswordChange">
@@ -116,29 +118,29 @@ $admins = fetchAdmins();
             const formData = new FormData(this);
 
             fetch('../app/controllers/insert-admin.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na resposta do servidor')
-                }
-                return response.text();
-            })
-            .then(data => {
-                alert(data);
-                if (data.includes('sucesso')) {
-                    const modalElement = document.getElementById('addAdminModal');
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                    modalInstance.hide();
-                    document.getElementById('addAdminForm').reset();
-                    location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao enviar dados: ', error);
-                alert('Erro ao adicionar administrador. Verifique o console.');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor')
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    alert(data);
+                    if (data.includes('sucesso')) {
+                        const modalElement = document.getElementById('addAdminModal');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide();
+                        document.getElementById('addAdminForm').reset();
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar dados: ', error);
+                    alert('Erro ao adicionar administrador. Verifique o console.');
+                });
         });
 
         document.querySelectorAll('.toggle-status').forEach(button => {
@@ -148,35 +150,36 @@ $admins = fetchAdmins();
 
                 if (confirm(`Tem certeza que deseja ${newStatus === 'no' ? 'desativar' : 'ativar'} este administrador?`)) {
                     fetch('../app/controllers/toggle-admin-status.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            adminId: adminId,
-                            newStatus: newStatus
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                adminId: adminId,
+                                newStatus: newStatus
+                            })
                         })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Erro na resposta do servidor');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        alert(data.message);
-                        location.reload();
-                    })
-                    .catch(error => {
-                        console.error('Erro ao atualizar status: ', error);
-                        alert('Erro ao atualizar status. Verifique o console.')
-                    });
-                    
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro na resposta do servidor');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            alert(data.message);
+                            location.reload();
+                        })
+                        .catch(error => {
+                            console.error('Erro ao atualizar status: ', error);
+                            alert('Erro ao atualizar status. Verifique o console.')
+                        });
+
                 }
             });
         });
     </script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

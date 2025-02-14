@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $counter = 1;
             $newUsername = $username . '-' . $counter;
 
-            while ($usernameExists ) {
+            while ($usernameExists) {
                 $newUsername = $username . '-' . ++$counter;
                 $stmt->bindParam(':username', $newUsername);
                 $stmt->execute();
@@ -47,6 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header('Content-Type: text/plain');
         echo "Administrador adicionado com sucesso!";
     } catch (PDOException $e) {
-        echo "Erro ao adicionar administrador". $e->getMessage();
+        echo "Erro ao adicionar administrador" . $e->getMessage();
     }
 }

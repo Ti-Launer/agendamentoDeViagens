@@ -7,8 +7,8 @@ $database = new Database();
 $pdo = $database->connect();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $adminId= $_POST['adminId'];
-    $newStatus= $_POST['newStatus'];
+    $adminId = $_POST['adminId'];
+    $newStatus = $_POST['newStatus'];
 
     // Validação Básica
     if (!is_numeric($adminId) || !in_array($newStatus, ['yes', 'no'])) {
@@ -28,12 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $stmt->execute();
         header('Content-Type: application/json');
-        echo json_encode(['message'=> 'Status atualizado com sucesso!']);
+        echo json_encode(['message' => 'Status atualizado com sucesso!']);
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error'=> 'Erro ao atualizar status: ' . $e->getMessage()]);
+        echo json_encode(['error' => 'Erro ao atualizar status: ' . $e->getMessage()]);
     }
 } else {
     http_response_code(405);
-    echo json_encode(['error'=> 'Método não permitido']);
+    echo json_encode(['error' => 'Método não permitido']);
 }

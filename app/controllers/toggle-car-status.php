@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $modelo = $carro['modelo'];
             $placa = $carro['placa'];
 
-            $type = "Colocou carro $modelo - $placa em manutenção";
+            $type = "Alterou o status do carro $modelo - $placa";
             // Inserção do log
             if (isset($_SESSION['admin_name'])) {
                 $admin_name = $_SESSION['admin_name'];

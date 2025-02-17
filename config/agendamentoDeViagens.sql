@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 10/02/2025 às 18:20
+-- Tempo de geração: 17/02/2025 às 17:22
 -- Versão do servidor: 10.4.28-MariaDB
 -- Versão do PHP: 8.2.4
 
@@ -112,6 +112,19 @@ CREATE TABLE `carros_disponiveis` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `logs_table`
+--
+
+CREATE TABLE `logs_table` (
+  `id` int(11) NOT NULL,
+  `admin` varchar(60) NOT NULL,
+  `datetime` datetime NOT NULL DEFAULT current_timestamp(),
+  `type` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `reservas`
 --
 
@@ -215,6 +228,12 @@ ALTER TABLE `carros`
   ADD PRIMARY KEY (`placa`);
 
 --
+-- Índices de tabela `logs_table`
+--
+ALTER TABLE `logs_table`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `reservas`
 --
 ALTER TABLE `reservas`
@@ -236,6 +255,12 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT de tabela `agenda_carros`
 --
 ALTER TABLE `agenda_carros`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `logs_table`
+--
+ALTER TABLE `logs_table`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

@@ -1,4 +1,5 @@
 <?php
+session_start(); 
 require_once 'db.php';
 require_once '../../config/email-config.php';
 function cancelarReserva($id, $mensagemCancelamento)
@@ -34,6 +35,19 @@ function cancelarReserva($id, $mensagemCancelamento)
                 if (!($emailConfig->sendMail($email, $subject, $body, $altBody))) {
                     echo "Erro ao enviar e-mail.";
                 }
+            }
+
+            $type = "Cancelou a reserva #$id";
+            // Inserção do log
+            if (isset($_SESSION['admin_name'])) {
+                $admin_name = $_SESSION['admin_name'];
+                $sql = "INSERT INTO logs_table (admin, type, datetime) VALUES (:admin, :type, NOW())";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':admin', $admin_name, PDO::PARAM_STR);
+                $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+                $stmt->execute();
+            } else {
+                throw new Exception("Sessão do administrador não encontrada.");
             }
         }
 

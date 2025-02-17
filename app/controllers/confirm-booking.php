@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'db.php';
 require_once __DIR__ . '/../../config/email-config.php';
 
@@ -76,6 +77,19 @@ function confirmBooking($id, $carro)
                 if (!($emailConfig->sendMail($email, $subjectConfirmation, $bodyConfirmation, $altBodyConfirmation))) {
                     echo json_encode(['status' => 'error', 'message' => 'Erro ao enviar e-mail.']);
                     exit();
+                }
+
+                $type = "Confirmou a reserva #$id para usar o carro $placaCarro - $modeloCarro";
+                // Inserção do log
+                if (isset($_SESSION['admin_name'])) {
+                    $admin_name = $_SESSION['admin_name'];
+                    $sql = "INSERT INTO logs_table (admin, type, datetime) VALUES (:admin, :type, NOW())";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(':admin', $admin_name, PDO::PARAM_STR);
+                    $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+                    $stmt->execute();
+                } else {
+                    throw new Exception("Sessão do administrador não encontrada.");
                 }
             }
         }

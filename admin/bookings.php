@@ -19,13 +19,9 @@ $pdo = $database->connect();
         .section {
             display: none;
         }
-
-        /* Oculta todas as seções inicialmente */
         .section.active {
             display: block;
         }
-
-        /* Exibe a seção ativa */
     </style>
 </head>
 
@@ -223,7 +219,7 @@ $pdo = $database->connect();
                             if (data.status === "success") {
                                 const kmFinalElem = document.getElementById(`kmFinal${reservaId}`);
                                 if (kmFinalElem) kmFinalElem.textContent = newKmFinal;
-                                editKmModal.hide();
+                                location.reload();
                             } else {
                                 alert("Erro: " + data.message);
                             }

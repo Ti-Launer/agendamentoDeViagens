@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once 'db.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -23,7 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bindParam(':detalhe', $detalhe);
         $stmt->bindParam(':km_atual', $kmAtual);
 
-        $stmt->execute();
+        if($stmt->execute()){
+            $type = "Inseriu um novo carro $modelo - $placa";
+            // Inserção do log
+            if (isset($_SESSION['admin_name'])) {
+                $admin_name = $_SESSION['admin_name'];
+                $sql = "INSERT INTO logs_table (admin, type, datetime) VALUES (:admin, :type, NOW())";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':admin', $admin_name, PDO::PARAM_STR);
+                $stmt->bindParam(':type', $type, PDO::PARAM_STR);
+                $stmt->execute();
+            } else {
+                throw new Exception("Sessão do administrador não encontrada.");
+            }
+        }
         header('Content-Type: text/plain');
         echo "Novo Carro adicionado com sucesso!";
     } catch (PDOException $e) {

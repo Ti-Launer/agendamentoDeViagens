@@ -6,25 +6,18 @@ ini_set('display_errors', 1);
 $database = new Database();
 $pdo = $database->connect();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['carId'], $_POST['usage'])) {
     $carId= $_POST['carId'];
-    $newStatus= $_POST['newStatus'];
-
-    // Validação Básica
-    if (!is_numeric($carId) || !in_array($newStatus, ['yes', 'no'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Parâmetros inválidos.']);
-        exit;
-    }
+    $usage= intval($_POST['usage']);
 
     try {
-        $sql = 'UPDATE carros SET ativo = :newStatus WHERE id = :carId';
+        $sql = 'UPDATE carros SET ativo = :usage WHERE placa = :carId';
         $stmt = $pdo->prepare($sql);
 
         $stmt->bindParam(':carId', $carId);
-        $stmt->bindParam(':newStatus', $newStatus);
+        $stmt->bindParam(':usage', $usage);
         error_log("carId: $carId");
-        error_log("newStatus: $newStatus");
+        error_log("usage: $usage");
 
         $stmt->execute();
         header('Content-Type: application/json');

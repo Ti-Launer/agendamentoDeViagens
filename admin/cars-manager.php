@@ -71,7 +71,7 @@ $cars = fetchCars();
                 </thead>
                 <tbody>
                     <?php foreach ($cars as $car): ?>
-                        <tr class="<?= $car['ativo'] === 'no' ? 'inactive-car display-none' : ''; ?>">
+                        <tr class="<?= $car['ativo'] == 0 ? 'inactive-car display-none' : ''; ?>">
                             <td><?= htmlspecialchars($car['modelo']); ?></td>
                             <td><?= htmlspecialchars($car['placa']); ?></td>
                             <td>
@@ -100,11 +100,11 @@ $cars = fetchCars();
                             </td>
                             <td class="inactive-cars-cell display-none">
                                 <?php if ($car['ativo'] == 1): ?>
-                                    <button class="btn btn-danger btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-status="0">
+                                    <button class="btn btn-danger btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-usage="0">
                                         Desativar
                                     </button>
                                 <?php else: ?>
-                                    <button class="btn btn-primary btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-status="1">
+                                    <button class="btn btn-primary btn-sm toggle-usage" data-id="<?= $car['placa']; ?>" data-usage="1">
                                         Ativar
                                     </button>
                                 <?php endif; ?>
@@ -234,7 +234,7 @@ $cars = fetchCars();
         document.querySelectorAll('.toggle-usage').forEach(button => {
             button.addEventListener('click', function() {
                 const carId = this.getAttribute('data-id');
-                const newStatus = this.getAttribute('data-status');
+                const usage = this.getAttribute('data-usage');
 
                 fetch('../app/controllers/toggle-car-usage.php', {
                         method: 'POST',
@@ -243,7 +243,7 @@ $cars = fetchCars();
                         },
                         body: new URLSearchParams({
                             carId: carId,
-                            newStatus: newStatus
+                            usage: usage
                         })
                     })
                     .then(response => {

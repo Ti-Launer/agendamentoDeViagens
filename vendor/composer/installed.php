@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1f53337af7eef8e0439f42d8eb4a8d7205e0478f',
+        'reference' => 'a42e20a1cbf5dcf89ac58d12946904c3b6e15e2a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1f53337af7eef8e0439f42d8eb4a8d7205e0478f',
+            'reference' => 'a42e20a1cbf5dcf89ac58d12946904c3b6e15e2a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -27,6 +27,15 @@
             'install_path' => __DIR__ . '/../phpmailer/phpmailer',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'phpstan/phpstan' => array(
+            'pretty_version' => '2.1.5',
+            'version' => '2.1.5.0',
+            'reference' => '451b17f9665481ee502adc39be987cb71067ece2',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpstan/phpstan',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
     ),
 );
